@@ -1,0 +1,1 @@
+/usr/bin/c++  -g   CMakeFiles/ega10.dir/main.cpp.o CMakeFiles/ega10.dir/progeny.cpp.o CMakeFiles/ega10.dir/procreator_choice.cpp.o CMakeFiles/ega10.dir/crossover.cpp.o CMakeFiles/ega10.dir/mutation.cpp.o CMakeFiles/ega10.dir/selection.cpp.o  -o ega10 
