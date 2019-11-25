@@ -13,9 +13,10 @@ class progeny {
     double tot_dist;
 public:
     progeny(void);
-    progeny(int g, int s, int *gen, bool first, bool rnd, bool bef, int entry, double **R);
+    progeny(int g, int s, int *gen, bool first, bool rnd, bool bef, int entry, double **R, bool show_proc);
     progeny(int g, int s, int *gen, double **R):progeny(g, s, gen, false, false, false, 0, R){};
     progeny(int g, int s, int *gen, bool first, double **R):progeny(g, s, gen, true, false, false, 0, R){};
+    progeny(int g, int s, int *gen, bool first, bool rnd, bool bef, int entry, double **R):progeny(g, s, gen, first, rnd, bef, entry, R, false){};
     progeny(const progeny &pr);
     ~progeny(void);
     bool operator==(const progeny &r);

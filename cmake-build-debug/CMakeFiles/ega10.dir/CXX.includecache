@@ -25,6 +25,8 @@ procreator_choice.h
 /home/augustinmay/CLionProjects/ega10/procreator_choice.h
 mutation.h
 /home/augustinmay/CLionProjects/ega10/mutation.h
+selection.h
+/home/augustinmay/CLionProjects/ega10/selection.h
 fstream
 -
 
@@ -49,4 +51,16 @@ math.h
 -
 
 /home/augustinmay/CLionProjects/ega10/progeny.h
+
+/home/augustinmay/CLionProjects/ega10/selection.h
+progeny.h
+/home/augustinmay/CLionProjects/ega10/progeny.h
+math.h
+-
+set
+-
+iostream
+-
+time.h
+-
 

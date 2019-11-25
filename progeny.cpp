@@ -155,7 +155,7 @@ progeny::progeny(void) {
     gen=new int[3];
 }
 
-progeny::progeny(int g, int s, int *gen, bool first, bool rnd, bool bef, int entry, double **R):generation(g), size(s){
+progeny::progeny(int g, int s, int *gen, bool first, bool rnd, bool bef, int entry, double **R, bool show_proc):generation(g), size(s){
     this->gen=new int[size];
     if(first){
         int tmp;
@@ -180,6 +180,7 @@ progeny::progeny(int g, int s, int *gen, bool first, bool rnd, bool bef, int ent
                     if(!bef){cout<<"---Method of the closest neighbour---\n\nWould you like to see the process of generating? y/n"<<endl;}
                     char ans='n';
                     if(!bef){cin>>ans;}
+                    if(show_proc){ans='y';}
                     if(ans=='Y'||ans=='y'){
                         closest_n(R, true);
                     }
@@ -197,6 +198,7 @@ progeny::progeny(int g, int s, int *gen, bool first, bool rnd, bool bef, int ent
                     if(!bef){cout<<"---Method of the closest city---\n\nWould you like to see the process of generating? y/n"<<endl;}
                     char ans='n';
                     if(!bef){cin>>ans;}
+                    if(show_proc){ans='y';}
                     if(ans=='Y'||ans=='y'){
                         closest_c(R, true);
                     }

@@ -10,6 +10,7 @@ CMakeFiles/ega10.dir/main.cpp.o: ../main.cpp
 CMakeFiles/ega10.dir/main.cpp.o: ../mutation.h
 CMakeFiles/ega10.dir/main.cpp.o: ../procreator_choice.h
 CMakeFiles/ega10.dir/main.cpp.o: ../progeny.h
+CMakeFiles/ega10.dir/main.cpp.o: ../selection.h
 
 CMakeFiles/ega10.dir/mutation.cpp.o: ../mutation.cpp
 CMakeFiles/ega10.dir/mutation.cpp.o: ../mutation.h
