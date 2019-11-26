@@ -117,6 +117,9 @@
 		<Unit filename="/home/augustinmay/CLionProjects/ega10/selection.h">
 			<Option target="ega10"/>
 		</Unit>
+		<Unit filename="/home/augustinmay/CLionProjects/ega10/stop_condition.h">
+			<Option target="ega10"/>
+		</Unit>
 		<Unit filename="/home/augustinmay/CLionProjects/ega10/CMakeLists.txt">
 			<Option virtualFolder="CMake Files\"/>
 		</Unit>

@@ -127,3 +127,12 @@ void PMX_crossover(progeny *par, progeny *ch, int size, double **R){
     ch[0]=*new progeny(par[0].get_gener()+1, size, tmp1, R);
     ch[1]=*new progeny(par[1].get_gener()+1, size, tmp2, R);
 }
+
+void crossover(progeny *par, progeny *ch, int size, double **R, bool change){
+    if(change){
+        OX_crossover(par, ch, size, R);
+    }
+    else{
+        PMX_crossover(par, ch, size, R);
+    }
+}
