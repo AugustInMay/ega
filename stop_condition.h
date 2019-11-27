@@ -10,6 +10,16 @@ double av_dist(progeny *pop, int size_of_pop){
     return ret/size_of_pop;
 }
 
+double min_dist(progeny *pop, int size_of_pop){
+    double ret=100000;
+    for(int i=0; i<size_of_pop; i++){
+        if(pop[i].get_dist()<ret){
+            ret=pop[i].get_dist();
+        }
+    }
+    return ret;
+}
+
 int genetic_dif(progeny *pop, int size_of_pop){
     int ret=size_of_pop;
     set<int> vis;
@@ -26,7 +36,7 @@ int genetic_dif(progeny *pop, int size_of_pop){
     return ret;
 }
 
-bool stop_cond(int sw, int max_all, int *cur_all, double *prev_val, progeny *pop, int size_of_pop, int max_all_nondif){
+bool stop_cond(int sw, int max_all, int *cur_all, double *prev_val, progeny *pop, int size_of_pop){
     switch(sw){
         case 1:{
             if(*cur_all==max_all){
@@ -72,6 +82,7 @@ bool stop_cond(int sw, int max_all, int *cur_all, double *prev_val, progeny *pop
                 }
             }
             else{
+                *cur_all=0;
                 return false;
             }
         }

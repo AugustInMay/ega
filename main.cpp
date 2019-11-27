@@ -2,6 +2,7 @@
 #include "procreator_choice.h"
 #include "mutation.h"
 #include "selection.h"
+#include "stop_condition.h"
 #include <fstream>
 
 int factorial(int i){
@@ -11,8 +12,9 @@ int factorial(int i){
 
 int main() {
     srand(time(NULL));
-    double **R=new double*[15];
-    int init_pop_meth, num_of_pop, mut_procent=10, mut_rand=rand()%101, mut_ind;
+    double **R=new double*[15], G_coef, prev_stop_cond_val=0;
+    int init_pop_meth, num_of_pop, mut_procent=10, mut_rand=rand()%101, mut_ind, cross_meth,
+    procreator_pairs_num, B, selec_method, max_stop_cond_val, cur_stop_cond_val=0, stop_cond_meth, num_of_iterations=1;
     char proc_of_gen_ans;
     bool init_pop_check=true, proc_of_gen, crossover_ind;
     for(int i=0; i<15; i++){
@@ -31,8 +33,8 @@ int main() {
     cout<<"First things first. By which method will the INITIAL POPULATION be built?\n1)Randomly 2)Greedy algorithm "
           "(closest neighbour) 3) Greedy algorithm (closest city)\n!WARNING! The chosen method will effect the ammount "
           "of population."<<endl;
-    cin>>init_pop_meth;
     while(init_pop_check){
+        cin>>init_pop_meth;
         switch(init_pop_meth){
             case 1:{
                 cout<<"\n-----Random method was chosen-----\nNow choose the number of population. You can choose from 2 to "
@@ -100,8 +102,8 @@ int main() {
     init_pop_check=true;
     cout<<"Now choose the crossover:\n1) OX-crossover 2) PMX-crossover"<<endl;
     while(init_pop_check){
-        cin>>init_pop_meth;
-        switch(init_pop_meth){
+        cin>>cross_meth;
+        switch(cross_meth){
             case 1:{
                 crossover_ind=true;
                 init_pop_check=false;
@@ -117,6 +119,39 @@ int main() {
             default:{
                 cout<<"Wrong input! Try again..."<<endl;
                 break;
+            }
+        }
+    }
+    cout<<"Now choose the number of procreator pairs (twice of that is the number of children). You can choose from 1 to "<<num_of_pop*(num_of_pop-1)/2<<endl;
+    while(true){
+        cin>>procreator_pairs_num;
+        if(procreator_pairs_num<1||procreator_pairs_num>(num_of_pop*(num_of_pop-1)/2)){
+            cout<<"Wrong input! Try again..."<<endl;
+        }
+        else{
+            break;
+        }
+    }
+    init_pop_check=true;
+    cout<<"There are now "<<procreator_pairs_num<<" pairs of procreators, and "<<procreator_pairs_num*2<<" possible children"<<endl;
+    cout<<"Now enter the g coefficient (0;1] to choose the number of procreators which will be replaced by the progenies:"<<endl;
+    while(true){
+        cin>>G_coef;
+        if(G_coef<=0||G_coef>1){
+            cout<<"Wrong input! Try again..."<<endl;
+        }
+        else{
+            cout<<"The overlap number is "<<overlap_num(G_coef, num_of_pop)<<". Is this acceptable? y/n";
+            cin>>proc_of_gen_ans;
+            while(proc_of_gen_ans!='y'&&proc_of_gen_ans!='Y'&&proc_of_gen_ans!='n'&&proc_of_gen_ans!='N'){
+                cout<<"Wrong input! Try again..."<<endl;
+                cin>>proc_of_gen_ans;
+            }
+            if(proc_of_gen_ans=='y'||proc_of_gen_ans=='Y'){
+                break;
+            }
+            else{
+                cout<<"Please, enter another coefficient..."<<endl;
             }
         }
     }
@@ -165,12 +200,83 @@ int main() {
             cin>>mut_procent;
         }
     }
+    init_pop_check=true;
+    cout<<"Please choose the selection method:\n1) Proportional method 2) B-tournament"<<endl;
+    while(init_pop_check){
+        cin>>selec_method;
+        switch(selec_method){
+            case 1:{
+                cout<<"\n-----Proportional method was chosen-----"<<endl;
+                init_pop_check=false;
+                break;
+            }
+            case 2:{
+                cout<<"\n-----B-tournament was chosen-----\nNow enter B (from 2 to "<<num_of_pop<<"):"<<endl;
+                cin>>B;
+                while(B<2||B>num_of_pop){
+                    cout<<"Wrong input! Try again..."<<endl;
+                    cin>>B;
+                }
+                init_pop_check=false;
+                break;
+            }
+            default:{
+                cout<<"Wrong input! Try again..."<<endl;
+                break;
+            }
+        }
+    }
+    init_pop_check=true;
+    cout<<"Finally choose the stop condition\n1) Iteration condition 2) Number of generations without "
+          "max improvement 3) Number of generations without average improvement 4) Low difference in population "
+          "immediately 5) Low difference in population for a period of time"<<endl;
+    while(init_pop_check){
+        cin>>stop_cond_meth;
+        switch(stop_cond_meth){
+            case 1:{
+                cout<<"\n-----Iteration condition was chosen-----\nEnter the maximum iteration"<<endl;
+                cin>>max_stop_cond_val;
+                init_pop_check=false;
+                break;
+            }
+            case 2:{
+                cout<<"\n-----Number of generations without max improvement was chosen-----\nEnter the number:"<<endl;
+                cin>>max_stop_cond_val;
+                init_pop_check=false;
+                break;
+            }
+            case 3:{
+                cout<<"\n-----Number of generations without average improvement was chosen-----\nEnter the number:"<<endl;
+                cin>>max_stop_cond_val;
+                init_pop_check=false;
+                break;
+            }
+            case 4:{
+                cout<<"\n-----Low difference in population immediately was chosen-----\nEnter the min difference:"<<endl;
+                cin>>max_stop_cond_val;
+                init_pop_check=false;
+                break;
+            }
+            case 5:{
+                cout<<"\n-----Low difference in population for a period of time was chosen-----\nEnter the min difference:"<<endl;
+                cin>>max_stop_cond_val;
+                cout<<"\nEnter the number of iterations:"<<endl;
+                cin>>prev_stop_cond_val;
+                init_pop_check=false;
+                break;
+            }
+            default:{
+                cout<<"Wrong input! Try again..."<<endl;
+                break;
+            }
+        }
+    }
     progeny *population=new progeny[num_of_pop];
     for(int i=0; i<num_of_pop; i++){
         if(proc_of_gen){
             cout<<"\n\n-----"<<i+1<<"-species-----"<<endl;
         }
-        population[i]=*new progeny(0, 15, NULL, true, false, true, init_pop_meth, R, proc_of_gen);
+        population[i]=*new progeny(0, num_of_pop, NULL, true, false, true, init_pop_meth, R, proc_of_gen);
         for(int j=0; j<i; j++){
             if(population[j]==population[i]){
                 if(proc_of_gen){
@@ -180,6 +286,17 @@ int main() {
                 continue;
             }
         }
+    }
+    for(int i=0; i<num_of_pop; i++){
+        cout<<"\n\n-----The 0 generation-----"<<endl;
+        population[i].show_gen();
+    }
+    if(stop_cond_meth==3){
+        prev_stop_cond_val=av_dist(population, num_of_pop);
+    }
+    while(!stop_cond(stop_cond_meth, max_stop_cond_val, &cur_stop_cond_val, &prev_stop_cond_val, population, num_of_pop)){
+        cout<<"\n\n-----The "<<num_of_iterations<<" generation-----"<<endl;
+        
     }
     return 0;
 }

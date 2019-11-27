@@ -145,7 +145,7 @@ void closest_c_alg(double **R, int size, int *gen, bool check){
                 }
             }
         }
-        cout<<gen[0]+1<<"}, with total distance = "<<dist+R[gen[size-1]][gen[0]];
+        cout<<gen[0]+1<<"}, with total distance = "<<dist+R[gen[size-1]][gen[0]]<<endl;
     }
 }
 

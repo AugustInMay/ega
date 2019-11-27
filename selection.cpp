@@ -1,6 +1,6 @@
 #include "selection.h"
 
-int overlap_num(int coef, int size_of_pop){
+int overlap_num(double coef, int size_of_pop){
     return floor((coef*size_of_pop)+0.5);
 }
 
