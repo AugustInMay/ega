@@ -39,41 +39,64 @@ int genetic_dif(progeny *pop, int size_of_pop){
 bool stop_cond(int sw, int max_all, int *cur_all, double *prev_val, progeny *pop, int size_of_pop){
     switch(sw){
         case 1:{
+            //сur is cur step
+            //max is max step
             if(*cur_all==max_all){
                 return true;
             }
-            return false;
+            break;
         }
         case 2:{
-            if(*cur_all==max_all){
-                return true;
-            }
-            return false;
-        }
-        case 3:{
-            if(*prev_val<=av_dist(pop, size_of_pop)){
-                *cur_all++;
+            //cur is cur iterations without min changing
+            //max is max -//-
+            //prev_val is the global min
+            if(*prev_val<=min_dist(pop, size_of_pop)){
+                *cur_all+=1;
                 if(*cur_all==max_all){
                     return true;
                 }
             }
             else{
+                *prev_val=min_dist(pop, size_of_pop);
+                *cur_all=0;
+                cout<<"!!!"<<endl;
+                return false;
+            }
+            break;
+        }
+        case 3:{
+            //cur is cur iterations without average changing
+            //max is max -//-
+            //prev val is the best average
+            if(*prev_val<=av_dist(pop, size_of_pop)){
+                *cur_all+=1;
+                if(*cur_all==max_all){
+                    return true;
+                }
+            }
+            else{
+                *prev_val=av_dist(pop, size_of_pop);
                 *cur_all=0;
                 return false;
             }
             break;
         }
         case 4:{
+            //max is min  allowed difference
             if(genetic_dif(pop, size_of_pop)<max_all){
                 return true;
             }
             else{
                 return false;
             }
+            break;
         }
         case 5:{
+            //max is min  allowed difference
+            //cur is cur iteration without dif changing
+            //prev is max iteration -//-
             if(genetic_dif(pop, size_of_pop)<max_all){
-                *cur_all++;
+                *cur_all+=1;
                 if(*cur_all==*prev_val){
                     return true;
                 }
@@ -85,6 +108,7 @@ bool stop_cond(int sw, int max_all, int *cur_all, double *prev_val, progeny *pop
                 *cur_all=0;
                 return false;
             }
+            break;
         }
         default:{
             break;

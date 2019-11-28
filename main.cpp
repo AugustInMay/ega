@@ -14,9 +14,10 @@ int main() {
     srand(time(NULL));
     double **R=new double*[15], G_coef, prev_stop_cond_val=0;
     int init_pop_meth, num_of_pop, mut_procent=10, mut_rand=rand()%101, mut_ind, cross_meth,
-    procreator_pairs_num, B, selec_method, max_stop_cond_val, cur_stop_cond_val=0, stop_cond_meth, num_of_iterations=1;
+    procreator_pairs_num, B, selec_method, max_stop_cond_val, cur_stop_cond_val=0, stop_cond_meth,
+    num_of_iterations=1, procr_choice, best_ind, global_ind;
     char proc_of_gen_ans;
-    bool init_pop_check=true, proc_of_gen, crossover_ind;
+    bool init_pop_check=true, proc_of_gen, crossover_ind, elitist;
     for(int i=0; i<15; i++){
         R[i]=new double[15];
     }
@@ -134,6 +135,32 @@ int main() {
     }
     init_pop_check=true;
     cout<<"There are now "<<procreator_pairs_num<<" pairs of procreators, and "<<procreator_pairs_num*2<<" possible children"<<endl;
+    cout<<"Choose by which method will the procreators be chosen:\n1) Randomly 2) Positive associative mating 3) Negative associative mating"<<endl;
+    while(init_pop_check){
+        cin>>procr_choice;
+        switch(procr_choice){
+            case 1:{
+                init_pop_check=false;
+                cout<<"\n-----Random method was chosen-----"<<endl;
+                break;
+            }
+            case 2:{
+                init_pop_check=false;
+                cout<<"\n-----Positive associative mating was chosen-----"<<endl;
+                break;
+            }
+            case 3:{
+                init_pop_check=false;
+                cout<<"\n-----Negative associative mating was chosen-----"<<endl;
+                break;
+            }
+            default:{
+                cout<<"Wrong input! Try again..."<<endl;
+                break;
+            }
+        }
+    }
+    progeny *ch=new progeny[procreator_pairs_num*2];
     cout<<"Now enter the g coefficient (0;1] to choose the number of procreators which will be replaced by the progenies:"<<endl;
     while(true){
         cin>>G_coef;
@@ -155,6 +182,7 @@ int main() {
             }
         }
     }
+    progeny *pot=new progeny[overlap_num(G_coef, num_of_pop)];
     init_pop_check=true;
     cout<<"Now choose the mutation:\n1) Dot mutation 2) Saltation 3) Inversion 4) Translocation"<<endl;
     while(init_pop_check){
@@ -226,6 +254,18 @@ int main() {
             }
         }
     }
+    cout<<"Would you like it to be an elitist one? y/n"<<endl;
+    cin>>proc_of_gen_ans;
+    while(proc_of_gen_ans!='y'&&proc_of_gen_ans!='Y'&&proc_of_gen_ans!='n'&&proc_of_gen_ans!='N'){
+        cout<<"Wrong input! Try again..."<<endl;
+        cin>>proc_of_gen_ans;
+    }
+    if(proc_of_gen_ans=='y'||proc_of_gen_ans=='Y'){
+        elitist=true;
+    }
+    else{
+        elitist=false;
+    }
     init_pop_check=true;
     cout<<"Finally choose the stop condition\n1) Iteration condition 2) Number of generations without "
           "max improvement 3) Number of generations without average improvement 4) Low difference in population "
@@ -276,7 +316,7 @@ int main() {
         if(proc_of_gen){
             cout<<"\n\n-----"<<i+1<<"-species-----"<<endl;
         }
-        population[i]=*new progeny(0, num_of_pop, NULL, true, false, true, init_pop_meth, R, proc_of_gen);
+        population[i]=*new progeny(0, 15, NULL, true, false, true, init_pop_meth, R, proc_of_gen);
         for(int j=0; j<i; j++){
             if(population[j]==population[i]){
                 if(proc_of_gen){
@@ -287,16 +327,82 @@ int main() {
             }
         }
     }
+    switch(stop_cond_meth){
+        case 2:{
+            prev_stop_cond_val=min_dist(population, num_of_pop);
+            break;
+        }
+        case 3:{
+            prev_stop_cond_val=av_dist(population, num_of_pop);
+            break;
+        }
+    }
+    cout<<"\n\n-----The 0 generation-----"<<endl;
     for(int i=0; i<num_of_pop; i++){
-        cout<<"\n\n-----The 0 generation-----"<<endl;
         population[i].show_gen();
+        double ret=100000;
+        if(population[i].get_dist()<=ret){
+            global_ind=i;
+        }
     }
-    if(stop_cond_meth==3){
-        prev_stop_cond_val=av_dist(population, num_of_pop);
-    }
-    while(!stop_cond(stop_cond_meth, max_stop_cond_val, &cur_stop_cond_val, &prev_stop_cond_val, population, num_of_pop)){
+    cout<<"The global solution is:"<<endl;
+    population[global_ind];
+    progeny par_per_it[2], ch_per_it[2];
+    while(true){
         cout<<"\n\n-----The "<<num_of_iterations<<" generation-----"<<endl;
-        
+        num_of_iterations++;
+        int j=0;
+        for(int i=0; i<procreator_pairs_num; i++){
+            procreator_choice_process(procr_choice, population, num_of_pop, 15, par_per_it, R);
+            crossover(par_per_it, ch_per_it, 15, R, crossover_ind);
+            ch[j]=*new progeny(ch_per_it[0]);
+            ch[j+1]=*new  progeny(ch_per_it[1]);
+            j+=2;
+        }
+        cout<<"\n\nCreated children:"<<endl;
+        for(int i=0; i<procreator_pairs_num*2; i++){
+            ch[i].show_gen();
+        }
+        for(int i=0; i<procreator_pairs_num*2; i++){
+            mut_rand=rand()%101;
+            if(mut_rand<=mut_procent){
+                cout<<"Mutation occured!!!"<<endl;
+                ch[i].show_gen();
+                cout<<"Changed to..."<<endl;
+                chosen_mut(mut_ind, ch[i], 15, R);
+                ch[i].show_gen();
+            }
+        }
+        if(selec_method==1){
+            roulete(overlap_num(G_coef, num_of_pop), ch, procreator_pairs_num*2, pot);
+        }
+        else{
+            B_tournament(overlap_num(G_coef, num_of_pop), ch, procreator_pairs_num*2, B, pot);
+        }
+        if(stop_cond_meth==1){
+            cur_stop_cond_val++;
+        }
+        overlap(overlap_num(G_coef, num_of_pop), population, num_of_pop, pot, elitist);
+        double ret=100000;
+        cout<<"\n!!!The new generation is:"<<endl;
+        for(int i=0; i<num_of_pop; i++){
+            population[i].show_gen();
+            double ret=100000;
+            if(population[i].get_dist()<=ret){
+                best_ind=i;
+            }
+        }
+        if(population[global_ind].get_dist()>population[best_ind].get_dist()){
+            global_ind=best_ind;
+        }
+        cout<<"\n!!!The best in generation is:"<<endl;
+        population[best_ind].show_gen();
+        if(stop_cond(stop_cond_meth, max_stop_cond_val, &cur_stop_cond_val, &prev_stop_cond_val, population, num_of_pop)){
+            break;
+        }
+
     }
+    cout<<"\n\n-----The best solution is:"<<endl;
+    population[global_ind].show_gen();
     return 0;
 }

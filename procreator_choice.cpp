@@ -105,3 +105,17 @@ void assort_minus(progeny *pop, int size_of_pop, int size_of_gen, progeny *par, 
         }
     }
 }
+
+void procreator_choice_process(int meth, progeny *pop, int size_of_pop, int size_of_gen, progeny *par, double **R){
+    switch(meth){
+        case 1:{
+            random_ch(pop, size_of_pop, size_of_gen, par, R);
+        }
+        case 2:{
+            assort_plus(pop, size_of_pop, size_of_gen, par, R);
+        }
+        case 3:{
+            assort_minus(pop, size_of_pop, size_of_gen, par, R);
+        }
+    }
+}

@@ -6,7 +6,6 @@
 
 void dot_mut(progeny &pr, int size, double **R){
     int tmp=rand()%(size-1), tmp_ind;
-    cout<<pr[tmp]+1<<" and "<<pr[tmp+1]+1<<endl;
     tmp_ind=pr[tmp];
     pr[tmp]=pr[tmp+1];
     pr[tmp+1]=tmp_ind;
@@ -18,7 +17,6 @@ void saltation(progeny &pr, int size, double **R){
     while(tmp1==tmp2){
         tmp2=rand()%size;
     }
-    cout<<pr[tmp1]+1<<" and "<<pr[tmp2]+1<<endl;
     tmp_ind=pr[tmp1];
     pr[tmp1]=pr[tmp2];
     pr[tmp2]=tmp_ind;
@@ -29,7 +27,6 @@ void inversion(progeny &pr, int size, double **R){
     while(tmp1==tmp2){
         tmp2=rand()%size;
     }
-    cout<<pr[tmp1]+1<<" and "<<pr[tmp2]+1<<endl;
     tmp_ar=new int[(abs(tmp1-tmp2))+1];
     if(tmp2>tmp1){
         cnt=tmp2;
@@ -63,7 +60,6 @@ void translocation(progeny &pr, int size, double **R){
     while(tmp1==tmp2){
         tmp2=rand()%size;
     }
-    cout<<pr[tmp1]+1<<" and "<<pr[tmp2]+1<<endl;
     if(tmp2>tmp1){
         cnt1=tmp1;
         cnt2=size-1;
@@ -109,4 +105,21 @@ void translocation(progeny &pr, int size, double **R){
         }
     }
     pr.dist_cnt(R);
+}
+
+void chosen_mut(int meth, progeny &pr, int size, double **R){
+    switch(meth){
+        case 1:{
+            dot_mut(pr, size, R);
+        }
+        case 2:{
+            saltation(pr, size, R);
+        }
+        case 3:{
+            inversion(pr, size, R);
+        }
+        case 4:{
+            translocation(pr, size, R);
+        }
+    }
 }

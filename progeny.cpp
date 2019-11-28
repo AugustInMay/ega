@@ -275,7 +275,7 @@ void progeny::show_gen() {
     for(int i=0; i<size; i++){
         cout<<gen[i]+1<<"-";
     }
-    cout<<gen[0]+1<<"\nIts distance is "<<tot_dist<<endl;
+    cout<<gen[0]+1<<"   Its distance is "<<tot_dist<<endl;
 }
 
 
