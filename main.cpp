@@ -17,7 +17,7 @@ int main() {
     procreator_pairs_num, B, selec_method, max_stop_cond_val, cur_stop_cond_val=0, stop_cond_meth,
     num_of_iterations=1, procr_choice, best_ind, global_ind;
     char proc_of_gen_ans;
-    bool init_pop_check=true, proc_of_gen, crossover_ind, elitist;
+    bool init_pop_check=true, proc_of_gen=false, crossover_ind, elitist=false, emergency_stop=false;
     for(int i=0; i<15; i++){
         R[i]=new double[15];
     }
@@ -239,9 +239,9 @@ int main() {
                 break;
             }
             case 2:{
-                cout<<"\n-----B-tournament was chosen-----\nNow enter B (from 2 to "<<num_of_pop<<"):"<<endl;
+                cout<<"\n-----B-tournament was chosen-----\nNow enter B (from 2 to "<<procreator_pairs_num*2<<"):"<<endl;
                 cin>>B;
-                while(B<2||B>num_of_pop){
+                while(B<2||B>procreator_pairs_num*2){
                     cout<<"Wrong input! Try again..."<<endl;
                     cin>>B;
                 }
@@ -254,7 +254,7 @@ int main() {
             }
         }
     }
-    cout<<"Would you like it to be an elitist one? y/n"<<endl;
+    /*cout<<"Would you like it to be an elitist one? y/n"<<endl;
     cin>>proc_of_gen_ans;
     while(proc_of_gen_ans!='y'&&proc_of_gen_ans!='Y'&&proc_of_gen_ans!='n'&&proc_of_gen_ans!='N'){
         cout<<"Wrong input! Try again..."<<endl;
@@ -265,7 +265,7 @@ int main() {
     }
     else{
         elitist=false;
-    }
+    }*/
     init_pop_check=true;
     cout<<"Finally choose the stop condition\n1) Iteration condition 2) Number of generations without "
           "max improvement 3) Number of generations without average improvement 4) Low difference in population "
@@ -338,22 +338,26 @@ int main() {
         }
     }
     cout<<"\n\n-----The 0 generation-----"<<endl;
+    double ret=100000;
     for(int i=0; i<num_of_pop; i++){
         population[i].show_gen();
-        double ret=100000;
         if(population[i].get_dist()<=ret){
+            ret=population[i].get_dist();
             global_ind=i;
         }
     }
+    progeny par_per_it[2], ch_per_it[2], solution=*new progeny(population[global_ind]);
     cout<<"The global solution is:"<<endl;
-    population[global_ind];
-    progeny par_per_it[2], ch_per_it[2];
+    solution.show_gen();
     while(true){
         cout<<"\n\n-----The "<<num_of_iterations<<" generation-----"<<endl;
         num_of_iterations++;
         int j=0;
         for(int i=0; i<procreator_pairs_num; i++){
-            procreator_choice_process(procr_choice, population, num_of_pop, 15, par_per_it, R);
+            procreator_choice_process(procr_choice, population, num_of_pop, 15, par_per_it, R, &emergency_stop);
+            if(emergency_stop){
+                goto Finished;
+            }
             crossover(par_per_it, ch_per_it, 15, R, crossover_ind);
             ch[j]=*new progeny(ch_per_it[0]);
             ch[j+1]=*new  progeny(ch_per_it[1]);
@@ -387,13 +391,13 @@ int main() {
         cout<<"\n!!!The new generation is:"<<endl;
         for(int i=0; i<num_of_pop; i++){
             population[i].show_gen();
-            double ret=100000;
             if(population[i].get_dist()<=ret){
+                ret=population[i].get_dist();
                 best_ind=i;
             }
         }
-        if(population[global_ind].get_dist()>population[best_ind].get_dist()){
-            global_ind=best_ind;
+        if(solution.get_dist()>population[best_ind].get_dist()){
+            solution=*new progeny(population[best_ind]);
         }
         cout<<"\n!!!The best in generation is:"<<endl;
         population[best_ind].show_gen();
@@ -402,7 +406,12 @@ int main() {
         }
 
     }
+    Finished:
     cout<<"\n\n-----The best solution is:"<<endl;
-    population[global_ind].show_gen();
+    solution.show_gen();
+    delete[] pot;
+    delete[] ch;
+    delete[] population;
+    delete[] R;
     return 0;
 }

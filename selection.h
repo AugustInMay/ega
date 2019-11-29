@@ -9,3 +9,4 @@ int overlap_num(double coef, int size_of_pop);
 void B_tournament(int ov_num, progeny *ch, int size_of_ch, int B, progeny *pot);
 void roulete(int ov_num, progeny *ch, int size_of_ch, progeny *pot);
 void overlap(int ov_num, progeny *pop, int size_of_pop, progeny *pot, bool elitist);
+progeny best_out_of_all(int size_of_pop, progeny *pop, int size_of_ch, progeny *ch);

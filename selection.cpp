@@ -78,14 +78,14 @@ void roulete(int ov_num, progeny *ch, int size_of_ch, progeny *pot){
         sum_dist+=(1/ch[i].get_dist());
     }
     for(int i=0; i<size_of_ch; i++){
-        ver[i]=((((1/ch[i].get_dist())/sum_dist)*100));
+        ver[i]=((((1/ch[i].get_dist())/sum_dist)*1000));
         if(i!=0){
             ver[i]+=ver[i-1];
         }
         ver[i] = floor(ver[i] + 0.5);
     }
     for(int j=0; j<ov_num; j++){
-        tmp=(rand()%101);
+        tmp=(rand()%1001);
         for(int i=0; i<size_of_ch; i++){
             if(tmp<=ver[i]){
                 pot[j]=*new progeny(ch[i]);
