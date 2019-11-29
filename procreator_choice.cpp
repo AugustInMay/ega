@@ -17,7 +17,6 @@ void random_ch(progeny *pop, int size_of_pop, int size_of_gen, progeny *par, dou
         tmp=rand()%size_of_pop;
         emerg_exit++;
         if(emerg_exit==size_of_pop*10){
-            cout<<"Couldn't find different parents...Emergency stop!"<<endl;
             *emerg=true;
             return;
         }
@@ -62,7 +61,6 @@ void assort_plus(progeny *pop, int size_of_pop, int size_of_gen, progeny *par, d
                 tmp2=(rand()%1001);
                 emerg_exit++;
                 if(emerg_exit==size_of_pop*10){
-                    cout<<"Couldn't find different parents...Emergency stop!"<<endl;
                     *emerg=true;
                     return;
                 }
@@ -115,7 +113,6 @@ void assort_minus(progeny *pop, int size_of_pop, int size_of_gen, progeny *par, 
                 tmp2=(rand()%1001);
                 emerg_exit++;
                 if(emerg_exit==size_of_pop*10){
-                    cout<<"Couldn't find different parents...Emergency stop!"<<endl;
                     *emerg=true;
                     return;
                 }
