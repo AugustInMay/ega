@@ -105,6 +105,8 @@ void translocation(progeny &pr, int size, double **R){
         }
     }
     pr.dist_cnt(R);
+    delete[] tmp_ar1;
+    delete[] tmp_ar2;
 }
 
 void chosen_mut(int meth, progeny &pr, int size, double **R){

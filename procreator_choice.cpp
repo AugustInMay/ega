@@ -25,11 +25,12 @@ void random_ch(progeny *pop, int size_of_pop, int size_of_gen, progeny *par, dou
         tmp_ar[i]=pop[tmp][i];
     }
     par[1]=*new progeny(pop[tmp].get_gener(), size_of_gen, tmp_ar, R);
+    delete[] tmp_ar;
 }
 
 void assort_plus(progeny *pop, int size_of_pop, int size_of_gen, progeny *par, double **R, bool *emerg){
     double *ver=new double[size_of_pop];
-    double sum_dist=0, tmp1=(rand()%1001), tmp2=(rand()%1001);
+    double sum_dist=0, tmp1, tmp2;
     int *tmp_ar1=new int[size_of_gen], *tmp_ar2=new int[size_of_gen];
     for(int i=0; i<size_of_pop; i++){
         sum_dist+=(1/pop[i].get_dist());
@@ -41,6 +42,7 @@ void assort_plus(progeny *pop, int size_of_pop, int size_of_gen, progeny *par, d
         }
         ver[i] = floor(ver[i] + 0.5);
     }
+    tmp1=(rand()%int(ver[size_of_pop-1]))+1;
     for(int i=0; i<size_of_pop; i++){
         if(tmp1<=ver[i]){
             for(int j=0; j<size_of_gen; j++){
@@ -50,6 +52,7 @@ void assort_plus(progeny *pop, int size_of_pop, int size_of_gen, progeny *par, d
             break;
         }
     }
+    tmp2=(rand()%int(ver[size_of_pop-1]))+1;
     int emerg_exit=1;
     for(int i=0; i<size_of_pop; i++){
         if(tmp2<=ver[i]){
@@ -58,7 +61,7 @@ void assort_plus(progeny *pop, int size_of_pop, int size_of_gen, progeny *par, d
             }
             par[1]=*new progeny(pop[0].get_gener(), size_of_gen, tmp_ar2, R);
             if(par[0]==par[1]){
-                tmp2=(rand()%1001);
+                tmp2=(rand()%int(ver[size_of_pop-1]))+1;
                 emerg_exit++;
                 if(emerg_exit==size_of_pop*10){
                     *emerg=true;
@@ -71,6 +74,8 @@ void assort_plus(progeny *pop, int size_of_pop, int size_of_gen, progeny *par, d
         }
     }
     delete[] ver;
+    delete[] tmp_ar1;
+    delete[] tmp_ar2;
 }
 
 void assort_minus(progeny *pop, int size_of_pop, int size_of_gen, progeny *par, double **R, bool *emerg){
@@ -93,6 +98,8 @@ void assort_minus(progeny *pop, int size_of_pop, int size_of_gen, progeny *par, 
         ver1[i] = floor(ver1[i] + 0.5);
         ver2[i]=floor(ver2[i]+0.5);
     }
+    tmp1=(rand()%int(ver1[size_of_pop-1]))+1;
+    tmp2=(rand()%int(ver2[size_of_pop-1]))+1;
     for(int i=0; i<size_of_pop; i++){
         if(tmp1<=ver1[i]){
             for(int j=0; j<size_of_gen; j++){
@@ -110,7 +117,7 @@ void assort_minus(progeny *pop, int size_of_pop, int size_of_gen, progeny *par, 
             }
             par[1]=*new progeny(pop[0].get_gener(), size_of_gen, tmp_ar2, R);
             if(par[0]==par[1]){
-                tmp2=(rand()%1001);
+                tmp2=(rand()%int(ver2[size_of_pop-1]))+1;
                 emerg_exit++;
                 if(emerg_exit==size_of_pop*10){
                     *emerg=true;
@@ -122,6 +129,10 @@ void assort_minus(progeny *pop, int size_of_pop, int size_of_gen, progeny *par, 
             break;
         }
     }
+    delete[] ver1;
+    delete[] ver2;
+    delete[] tmp_ar1;
+    delete[] tmp_ar2;
 }
 
 void procreator_choice_process(int meth, progeny *pop, int size_of_pop, int size_of_gen, progeny *par, double **R, bool *emerg){

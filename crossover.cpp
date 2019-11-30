@@ -73,6 +73,8 @@ void OX_crossover(progeny *par, progeny *ch, int size, double **R){
     }
     ch[0]=*new progeny(par[0].get_gener()+1, size, tmp1, R);
     ch[1]=*new progeny(par[1].get_gener()+1, size, tmp2, R);
+    delete[] tmp1;
+    delete[] tmp2;
 }
 
 void PMX_crossover(progeny *par, progeny *ch, int size, double **R){
@@ -126,6 +128,8 @@ void PMX_crossover(progeny *par, progeny *ch, int size, double **R){
     }
     ch[0]=*new progeny(par[0].get_gener()+1, size, tmp1, R);
     ch[1]=*new progeny(par[1].get_gener()+1, size, tmp2, R);
+    delete[] tmp1;
+    delete[] tmp2;
 }
 
 void crossover(progeny *par, progeny *ch, int size, double **R, bool change){

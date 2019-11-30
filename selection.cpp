@@ -69,6 +69,7 @@ void B_tournament(int ov_num, progeny *ch, int size_of_ch, int B, progeny *pot){
         visited.clear();
         pot[i]=*new progeny(winner);
     }
+    delete[] duel;
 }
 
 void roulete(int ov_num, progeny *ch, int size_of_ch, progeny *pot){
@@ -85,7 +86,7 @@ void roulete(int ov_num, progeny *ch, int size_of_ch, progeny *pot){
         ver[i] = floor(ver[i] + 0.5);
     }
     for(int j=0; j<ov_num; j++){
-        tmp=(rand()%1001);
+        tmp=(rand()%int(ver[size_of_ch-1]))+1;
         for(int i=0; i<size_of_ch; i++){
             if(tmp<=ver[i]){
                 pot[j]=*new progeny(ch[i]);
@@ -93,4 +94,5 @@ void roulete(int ov_num, progeny *ch, int size_of_ch, progeny *pot){
             }
         }
     }
+    delete[] ver;
 }

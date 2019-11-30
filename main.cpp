@@ -11,13 +11,14 @@ int factorial(int i){
 }
 
 int main() {
+    ofstream outdata, out_more_data;
+    outdata.open("Table.csv");
     srand(time(NULL));
-    double **R=new double*[15], G_coef=0.5, prev_stop_cond_val=0;
-    int init_pop_meth=1, num_of_pop=100, mut_procent=10, mut_rand=rand()%101, mut_ind=3, cross_meth=1,
-    procreator_pairs_num=20, B=5, selec_method=2, max_stop_cond_val=100, cur_stop_cond_val=0, stop_cond_meth=1,
-    num_of_iterations=1, procr_choice=3, best_ind, global_ind;
+    double **R=new double*[15], prev_stop_cond_val=0;
+    int init_pop_meth=1, mut_procent=10, mut_rand=rand()%101, cross_meth=1, cur_stop_cond_val=0, stop_cond_meth=1,
+    num_of_iterations=1, best_ind, global_ind, iteration_overall=0;
     char proc_of_gen_ans;
-    bool init_pop_check=true, proc_of_gen=false, crossover_ind= true, elitist=false, emergency_stop=false;
+    bool init_pop_check=true, proc_of_gen=false, elitist=false, emergency_stop=false;
     for(int i=0; i<15; i++){
         R[i]=new double[15];
     }
@@ -31,6 +32,41 @@ int main() {
             }
         }
     }
+    int num_of_pop[4];
+    num_of_pop[0]=10;
+    num_of_pop[1]=30;
+    num_of_pop[2]=50;
+    num_of_pop[3]=100;
+    double G_coef[3];
+    G_coef[0]=(1.0)/double(num_of_pop[0]);
+    G_coef[1]=0.5;
+    G_coef[2]=1;
+    int mut_ind[4];
+    mut_ind[0]=1;
+    mut_ind[1]=2;
+    mut_ind[2]=3;
+    mut_ind[3]=4;
+    int procreator_pairs_num[3];
+    procreator_pairs_num[0]=5;
+    procreator_pairs_num[1]=10;
+    procreator_pairs_num[2]=num_of_pop[0]/2;
+    int selec_method[2];
+    selec_method[0]=1;
+    selec_method[1]=2;
+    int B[2];
+    B[0]=2;
+    B[1]=num_of_pop[0]/5;
+    bool crossover_ind[2];
+    crossover_ind[0]=true;
+    crossover_ind[1]=false;
+    int max_stop_cond_val[3];
+    max_stop_cond_val[0]=10;
+    max_stop_cond_val[1]=50;
+    max_stop_cond_val[2]=100;
+    int procr_choice[3];
+    procr_choice[0]=1;
+    procr_choice[1]=2;
+    procr_choice[2]=3;
     /*cout<<"First things first. By which method will the INITIAL POPULATION be built?\n1)Randomly 2)Greedy algorithm "
           "(closest neighbour) 3) Greedy algorithm (closest city)\n!WARNING! The chosen method will effect the ammount "
           "of population."<<endl;
@@ -309,98 +345,238 @@ int main() {
             }
         }
     }*/
-    for(int kj=0; kj<5; kj++){
-        progeny *ch=new progeny[procreator_pairs_num*2];
-        progeny *population=new progeny[num_of_pop];
-        progeny *pot=new progeny[overlap_num(G_coef, num_of_pop)];
-        emergency_stop=false;
-        for(int i=0; i<num_of_pop; i++){
-            if(proc_of_gen){
-                cout<<"\n\n-----"<<i+1<<"-species-----"<<endl;
-            }
-            population[i]=*new progeny(0, 15, NULL, true, false, true, init_pop_meth, R, proc_of_gen);
-            for(int j=0; j<i; j++){
-                if(population[j]==population[i]){
-                    if(proc_of_gen){
-                        cout<<"\n!!!However, there is this gen already. Retrying..."<<endl;
-                    }
-                    i--;
-                    continue;
-                }
-            }
-        }
-        switch(stop_cond_meth){
-            case 2:{
-                prev_stop_cond_val=min_dist(population, num_of_pop);
-                break;
-            }
-            case 3:{
-                prev_stop_cond_val=av_dist(population, num_of_pop);
-                break;
-            }
-        }
-        double ret=100000;
-        for(int i=0; i<num_of_pop; i++){
-            if(population[i].get_dist()<=ret){
-                ret=population[i].get_dist();
-                global_ind=i;
-            }
-        }
-        progeny par_per_it[2], ch_per_it[2], solution=*new progeny(population[global_ind]);
-        cout<<"\nThe initial global solution is:"<<endl;
-        solution.show_gen();
-        while(true){
-            num_of_iterations++;
-            int j=0;
-            for(int i=0; i<procreator_pairs_num; i++){
-                procreator_choice_process(procr_choice, population, num_of_pop, 15, par_per_it, R, &emergency_stop);
-                if(emergency_stop){
-                    goto Finished;
-                }
-                crossover(par_per_it, ch_per_it, 15, R, crossover_ind);
-                ch[j]=*new progeny(ch_per_it[0]);
-                ch[j+1]=*new  progeny(ch_per_it[1]);
-                j+=2;
-            }
-            for(int i=0; i<procreator_pairs_num*2; i++){
-                mut_rand=rand()%101;
-                if(mut_rand<=mut_procent){
-                    chosen_mut(mut_ind, ch[i], 15, R);
-                }
-            }
-            if(selec_method==1){
-                roulete(overlap_num(G_coef, num_of_pop), ch, procreator_pairs_num*2, pot);
-            }
-            else{
-                B_tournament(overlap_num(G_coef, num_of_pop), ch, procreator_pairs_num*2, B, pot);
-            }
-            if(stop_cond_meth==1){
-                cur_stop_cond_val++;
-            }
-            overlap(overlap_num(G_coef, num_of_pop), population, num_of_pop, pot, elitist);
-            double ret=100000;
-            for(int i=0; i<num_of_pop; i++){
-                if(population[i].get_dist()<=ret){
-                    ret=population[i].get_dist();
-                    best_ind=i;
-                }
-            }
-            if(solution.get_dist()>population[best_ind].get_dist()){
-                solution=*new progeny(population[best_ind]);
-            }
-            if(stop_cond(stop_cond_meth, max_stop_cond_val, &cur_stop_cond_val, &prev_stop_cond_val, population, num_of_pop)){
-                break;
-            }
+    for(int cross_ind=0; cross_ind<2; cross_ind++){
+        for(int num_of_pop_ind=0; num_of_pop_ind<4; num_of_pop_ind++){
+            for(int G_coef_ind=0; G_coef_ind<3; G_coef_ind++){
+                G_coef[0]=(1.0)/double(num_of_pop[num_of_pop_ind]);
+                for(int ind_of_mut=0; ind_of_mut<4; ind_of_mut++){
+                    for(int procr_pairs_ind=0; procr_pairs_ind<3; procr_pairs_ind++){
+                        procreator_pairs_num[2]=num_of_pop[num_of_pop_ind]/2;
+                        for(int selec_meth_ind=0; selec_meth_ind<2; selec_meth_ind++){
+                            if(selec_meth_ind==1){
+                                for(int B_ind=0; B_ind<2; B_ind++){
+                                    B[1]=(procreator_pairs_num[procr_pairs_ind]*2)/5;
+                                    for(int step_max_ind=0; step_max_ind<3; step_max_ind++){
+                                        for(int procr_choice_ind=0; procr_choice_ind<3; procr_choice_ind++){
+                                            iteration_overall++;
+                                            progeny *ch=new progeny[procreator_pairs_num[procr_pairs_ind]*2];
+                                            progeny *population=new progeny[num_of_pop[num_of_pop_ind]];
+                                            progeny *pot=new progeny[overlap_num(G_coef[G_coef_ind], num_of_pop[num_of_pop_ind])];
+                                            emergency_stop=false;
+                                            for(int i=0; i<num_of_pop[num_of_pop_ind]; i++){
+                                                /*if(proc_of_gen){
+                                                    cout<<"\n\n-----"<<i+1<<"-species-----"<<endl;
+                                                }*/
+                                                population[i]=*new progeny(0, 15, NULL, true, false, true, init_pop_meth, R, proc_of_gen);
+                                                for(int j=0; j<i; j++){
+                                                    if(population[j]==population[i]){
+                                                        /*if(proc_of_gen){
+                                                            cout<<"\n!!!However, there is this gen already. Retrying..."<<endl;
+                                                        }*/
+                                                        i--;
+                                                        continue;
+                                                    }
+                                                }
+                                            }
+                                            /*switch(stop_cond_meth){
+                                                case 2:{
+                                                    prev_stop_cond_val=min_dist(population, num_of_pop);
+                                                    break;
+                                                }
+                                                case 3:{
+                                                    prev_stop_cond_val=av_dist(population, num_of_pop);
+                                                    break;
+                                                }
+                                            }*/
+                                            double ret=100000;
+                                            cout<<"CR-"<<cross_ind<<", PN-"<<num_of_pop[num_of_pop_ind]<<", G-"<<overlap_num(G_coef[G_coef_ind], num_of_pop[num_of_pop_ind])<<", MT-"<<mut_ind[ind_of_mut]<<", PP-"<<procreator_pairs_num[procr_pairs_ind]<<", SM-"<<selec_method[selec_meth_ind]<<", B-"<<B[B_ind]<<", MAX_STEP"<<max_stop_cond_val[step_max_ind]<<", PC-"<<procr_choice[procr_choice_ind]<<endl;
+                                            //cout<<"\n\n-----The 0 generation-----"<<endl;
+                                            for(int i=0; i<num_of_pop[num_of_pop_ind]; i++){
+                                                //population[i].show_gen();
+                                                if(population[i].get_dist()<=ret){
+                                                    ret=population[i].get_dist();
+                                                    global_ind=i;
+                                                }
+                                            }
+                                            progeny par_per_it[2], ch_per_it[2], solution=*new progeny(population[global_ind]);
+                                            cout<<"\nThe initial global solution is:"<<endl;
+                                            solution.show_gen();
+                                            while(true){
+                                                //cout<<"\n\n-----The "<<num_of_iterations<<" generation-----"<<endl;
+                                                num_of_iterations++;
+                                                int j=0;
+                                                for(int i=0; i<procreator_pairs_num[procr_pairs_ind]; i++){
+                                                    procreator_choice_process(procr_choice[procr_choice_ind], population, num_of_pop[num_of_pop_ind], 15, par_per_it, R, &emergency_stop);
+                                                    if(emergency_stop){
+                                                        goto Finished1;
+                                                    }
+                                                    crossover(par_per_it, ch_per_it, 15, R, crossover_ind[cross_ind]);
+                                                    ch[j]=*new progeny(ch_per_it[0]);
+                                                    ch[j+1]=*new  progeny(ch_per_it[1]);
+                                                    j+=2;
+                                                }
+                                                /*cout<<"\n\nCreated children:"<<endl;
+                                                for(int i=0; i<procreator_pairs_num[procr_pairs_ind]*2; i++){
+                                                    ch[i].show_gen();
+                                                }*/
+                                                for(int i=0; i<procreator_pairs_num[procr_pairs_ind]*2; i++){
+                                                    mut_rand=rand()%101;
+                                                    if(mut_rand<=mut_procent){
+                                                        //cout<<"Mutation occured!!!"<<endl;
+                                                        //ch[i].show_gen();
+                                                        chosen_mut(mut_ind[ind_of_mut], ch[i], 15, R);
+                                                        //cout<<"Changed to..."<<endl;
+                                                        //ch[i].show_gen();
+                                                    }
+                                                }
+                                                B_tournament(overlap_num(G_coef[G_coef_ind], num_of_pop[num_of_pop_ind]), ch, procreator_pairs_num[procr_pairs_ind]*2, B[B_ind], pot);
+                                                if(stop_cond_meth==1){
+                                                    cur_stop_cond_val++;
+                                                }
+                                                overlap(overlap_num(G_coef[G_coef_ind], num_of_pop[num_of_pop_ind]), population, num_of_pop[num_of_pop_ind], pot, elitist);
+                                                //cout<<"\n!!!The new generation is:"<<endl;
+                                                double ret=100000;
+                                                for(int i=0; i<num_of_pop[num_of_pop_ind]; i++){
+                                                    //population[i].show_gen();
+                                                    if(population[i].get_dist()<=ret){
+                                                        ret=population[i].get_dist();
+                                                        best_ind=i;
+                                                    }
+                                                }
+                                                if(solution.get_dist()>population[best_ind].get_dist()){
+                                                    solution=*new progeny(population[best_ind]);
+                                                }
+                                                if(stop_cond(stop_cond_meth, max_stop_cond_val[step_max_ind], &cur_stop_cond_val, &prev_stop_cond_val, population, num_of_pop[num_of_pop_ind])){
+                                                    break;
+                                                }
 
+                                            }
+                                            Finished1:
+                                            cout<<"-----The end best solution is:"<<endl;
+                                            solution.show_gen();
+                                            num_of_iterations=1;
+                                            cur_stop_cond_val=0;
+                                            delete[] pot;
+                                            delete[] ch;
+                                            delete[] population;
+                                            cout<<iteration_overall<<endl;
+                                        }
+                                    }
+                                }
+                            }
+                            else{
+                                for(int step_max_ind=0; step_max_ind<3; step_max_ind++){
+                                    for(int procr_choice_ind=0; procr_choice_ind<3; procr_choice_ind++){
+                                        cout<<"CR-"<<cross_ind<<", PN-"<<num_of_pop[num_of_pop_ind]<<", G-"<<overlap_num(G_coef[G_coef_ind], num_of_pop[num_of_pop_ind])<<", MT-"<<mut_ind[ind_of_mut]<<", PP-"<<procreator_pairs_num[procr_pairs_ind]<<", SM-"<<selec_method[selec_meth_ind]<<", MAX_STEP"<<max_stop_cond_val[step_max_ind]<<", PC-"<<procr_choice[procr_choice_ind]<<endl;
+                                        iteration_overall++;
+                                        progeny *ch=new progeny[procreator_pairs_num[procr_pairs_ind]*2];
+                                        progeny *population=new progeny[num_of_pop[num_of_pop_ind]];
+                                        progeny *pot=new progeny[overlap_num(G_coef[G_coef_ind], num_of_pop[num_of_pop_ind])];
+                                        emergency_stop=false;
+                                        //cout<<"\n\n-----The 0 generation-----"<<endl;
+                                        for(int i=0; i<num_of_pop[num_of_pop_ind]; i++){
+                                            /*if(proc_of_gen){
+                                                cout<<"\n\n-----"<<i+1<<"-species-----"<<endl;
+                                            }*/
+                                            population[i]=*new progeny(0, 15, NULL, true, false, true, init_pop_meth, R, proc_of_gen);
+                                            for(int j=0; j<i; j++){
+                                                if(population[j]==population[i]){
+                                                    /*if(proc_of_gen){
+                                                        cout<<"\n!!!However, there is this gen already. Retrying..."<<endl;
+                                                    }*/
+                                                    i--;
+                                                    continue;
+                                                }
+                                            }
+                                        }
+                                        /*switch(stop_cond_meth){
+                                            case 2:{
+                                                prev_stop_cond_val=min_dist(population, num_of_pop);
+                                                break;
+                                            }
+                                            case 3:{
+                                                prev_stop_cond_val=av_dist(population, num_of_pop);
+                                                break;
+                                            }
+                                        }*/
+                                        double ret=100000;
+                                        for(int i=0; i<num_of_pop[num_of_pop_ind]; i++){
+                                            //population[i].show_gen();
+                                            if(population[i].get_dist()<=ret){
+                                                ret=population[i].get_dist();
+                                                global_ind=i;
+                                            }
+                                        }
+                                        progeny par_per_it[2], ch_per_it[2], solution=*new progeny(population[global_ind]);
+                                        cout<<"\nThe initial global solution is:"<<endl;
+                                        solution.show_gen();
+                                        while(true){
+                                            //cout<<"\n\n-----The "<<num_of_iterations<<" generation-----"<<endl;
+                                            num_of_iterations++;
+                                            int j=0;
+                                            for(int i=0; i<procreator_pairs_num[procr_pairs_ind]; i++){
+                                                procreator_choice_process(procr_choice[procr_choice_ind], population, num_of_pop[num_of_pop_ind], 15, par_per_it, R, &emergency_stop);
+                                                if(emergency_stop){
+                                                    goto Finished2;
+                                                }
+                                                crossover(par_per_it, ch_per_it, 15, R, crossover_ind[cross_ind]);
+                                                ch[j]=*new progeny(ch_per_it[0]);
+                                                ch[j+1]=*new  progeny(ch_per_it[1]);
+                                                j+=2;
+                                            }
+                                            /*cout<<"\n\nCreated children:"<<endl;
+                                            for(int i=0; i<procreator_pairs_num[procr_pairs_ind]*2; i++){
+                                                ch[i].show_gen();
+                                            }*/
+                                            for(int i=0; i<procreator_pairs_num[procr_pairs_ind]*2; i++){
+                                                mut_rand=rand()%101;
+                                                if(mut_rand<=mut_procent){
+                                                    //cout<<"Mutation occured!!!"<<endl;
+                                                    //ch[i].show_gen();
+                                                    chosen_mut(mut_ind[ind_of_mut], ch[i], 15, R);
+                                                    //cout<<"Changed to..."<<endl;
+                                                    //ch[i].show_gen();
+                                                }
+                                            }
+                                            roulete(overlap_num(G_coef[G_coef_ind], num_of_pop[num_of_pop_ind]), ch, procreator_pairs_num[procr_pairs_ind]*2, pot);
+                                            if(stop_cond_meth==1){
+                                                cur_stop_cond_val++;
+                                            }
+                                            overlap(overlap_num(G_coef[G_coef_ind], num_of_pop[num_of_pop_ind]), population, num_of_pop[num_of_pop_ind], pot, elitist);
+                                            //cout<<"\n!!!The new generation is:"<<endl;
+                                            double ret=100000;
+                                            for(int i=0; i<num_of_pop[num_of_pop_ind]; i++){
+                                                //population[i].show_gen();
+                                                if(population[i].get_dist()<=ret){
+                                                    ret=population[i].get_dist();
+                                                    best_ind=i;
+                                                }
+                                            }
+                                            if(solution.get_dist()>population[best_ind].get_dist()){
+                                                solution=*new progeny(population[best_ind]);
+                                            }
+                                            if(stop_cond(stop_cond_meth, max_stop_cond_val[step_max_ind], &cur_stop_cond_val, &prev_stop_cond_val, population, num_of_pop[num_of_pop_ind])){
+                                                break;
+                                            }
+
+                                        }
+                                        Finished2:
+                                        cout<<"-----The end best solution is:"<<endl;
+                                        solution.show_gen();
+                                        num_of_iterations=1;
+                                        cur_stop_cond_val=0;
+                                        delete[] pot;
+                                        delete[] ch;
+                                        delete[] population;
+                                        cout<<iteration_overall<<endl;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
-        Finished:
-        cout<<"-----The end best solution is:"<<endl;
-        solution.show_gen();
-        num_of_iterations=1;
-        cur_stop_cond_val=0;
-        delete[] pot;
-        delete[] ch;
-        delete[] population;
     }
     delete[] R;
     return 0;
