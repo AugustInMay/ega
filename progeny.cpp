@@ -279,6 +279,16 @@ void progeny::show_gen() {
     cout<<gen[0]+1<<"   Its distance is "<<tot_dist<<endl;
 }
 
+std::string progeny::show_str_gen() {
+    string ret="";
+    for(int i=0; i<size; i++){
+        ret+=to_string(gen[i]+1);
+        ret+="-";
+    }
+    ret+=to_string(gen[0]+1);
+    return ret;
+}
+
 
 bool progeny::operator==(const progeny &r) {
     if(this->size==r.size){

@@ -11,8 +11,9 @@ int factorial(int i){
 }
 
 int main() {
-    ofstream outdata, out_more_data;
-    outdata.open("Table.csv");
+    ofstream outdata, out_add_data;
+    outdata.open("Table1.csv");
+    out_add_data.open("Table2.csv");
     srand(time(NULL));
     double **R=new double*[15], prev_stop_cond_val=0;
     int init_pop_meth=1, mut_procent=10, mut_rand=rand()%101, cross_meth=1, cur_stop_cond_val=0, stop_cond_meth=1,
@@ -41,11 +42,6 @@ int main() {
     G_coef[0]=(1.0)/double(num_of_pop[0]);
     G_coef[1]=0.5;
     G_coef[2]=1;
-    int mut_ind[4];
-    mut_ind[0]=1;
-    mut_ind[1]=2;
-    mut_ind[2]=3;
-    mut_ind[3]=4;
     int procreator_pairs_num[3];
     procreator_pairs_num[0]=5;
     procreator_pairs_num[1]=10;
@@ -345,19 +341,22 @@ int main() {
             }
         }
     }*/
+    outdata<<"Configuration"<<";"<<"Iteration"<<";"<<"The initial best way"<<";"<<"Its distance"<<";"<<"The best way after algorithm"<<";"<<"Its distance"<<endl;
+    out_add_data<<"Configuration"<<";"<<"Best way"<<";"<<"Its distance"<<";"<<"Average way"<<";"<<"Dispersion"<<endl;
     for(int cross_ind=0; cross_ind<2; cross_ind++){
         for(int num_of_pop_ind=0; num_of_pop_ind<4; num_of_pop_ind++){
             for(int G_coef_ind=0; G_coef_ind<3; G_coef_ind++){
                 G_coef[0]=(1.0)/double(num_of_pop[num_of_pop_ind]);
-                for(int ind_of_mut=0; ind_of_mut<4; ind_of_mut++){
-                    for(int procr_pairs_ind=0; procr_pairs_ind<3; procr_pairs_ind++){
-                        procreator_pairs_num[2]=num_of_pop[num_of_pop_ind]/2;
-                        for(int selec_meth_ind=0; selec_meth_ind<2; selec_meth_ind++){
-                            if(selec_meth_ind==1){
-                                for(int B_ind=0; B_ind<2; B_ind++){
-                                    B[1]=(procreator_pairs_num[procr_pairs_ind]*2)/5;
-                                    for(int step_max_ind=0; step_max_ind<3; step_max_ind++){
-                                        for(int procr_choice_ind=0; procr_choice_ind<3; procr_choice_ind++){
+                for(int procr_pairs_ind=0; procr_pairs_ind<3; procr_pairs_ind++){
+                    procreator_pairs_num[2]=num_of_pop[num_of_pop_ind]/2;
+                    for(int selec_meth_ind=0; selec_meth_ind<2; selec_meth_ind++){
+                        if(selec_meth_ind==1){
+                            for(int B_ind=0; B_ind<2; B_ind++){
+                                B[1]=(procreator_pairs_num[procr_pairs_ind]*2)/5;
+                                for(int step_max_ind=0; step_max_ind<3; step_max_ind++){
+                                    for(int procr_choice_ind=0; procr_choice_ind<3; procr_choice_ind++){
+                                        progeny *sec_table=new progeny[4];
+                                        for(int iter=0; iter<4; iter++){
                                             iteration_overall++;
                                             progeny *ch=new progeny[procreator_pairs_num[procr_pairs_ind]*2];
                                             progeny *population=new progeny[num_of_pop[num_of_pop_ind]];
@@ -389,7 +388,7 @@ int main() {
                                                 }
                                             }*/
                                             double ret=100000;
-                                            cout<<"CR-"<<cross_ind<<", PN-"<<num_of_pop[num_of_pop_ind]<<", G-"<<overlap_num(G_coef[G_coef_ind], num_of_pop[num_of_pop_ind])<<", MT-"<<mut_ind[ind_of_mut]<<", PP-"<<procreator_pairs_num[procr_pairs_ind]<<", SM-"<<selec_method[selec_meth_ind]<<", B-"<<B[B_ind]<<", MAX_STEP"<<max_stop_cond_val[step_max_ind]<<", PC-"<<procr_choice[procr_choice_ind]<<endl;
+                                            outdata<<"CR-"<<cross_ind<<" PN-"<<num_of_pop[num_of_pop_ind]<<" G-"<<overlap_num(G_coef[G_coef_ind], num_of_pop[num_of_pop_ind])<<" PP-"<<procreator_pairs_num[procr_pairs_ind]<<" SM-"<<selec_method[selec_meth_ind]<<" B-"<<B[B_ind]<<" MAX_STEP"<<max_stop_cond_val[step_max_ind]<<" PC-"<<procr_choice[procr_choice_ind]<<";"<<iter+1<<";";
                                             //cout<<"\n\n-----The 0 generation-----"<<endl;
                                             for(int i=0; i<num_of_pop[num_of_pop_ind]; i++){
                                                 //population[i].show_gen();
@@ -398,9 +397,8 @@ int main() {
                                                     global_ind=i;
                                                 }
                                             }
-                                            progeny par_per_it[2], ch_per_it[2], solution=*new progeny(population[global_ind]);
-                                            cout<<"\nThe initial global solution is:"<<endl;
-                                            solution.show_gen();
+                                            progeny *par_per_it=new progeny[2], *ch_per_it=new progeny[2], *solution=new progeny(population[global_ind]);
+                                            outdata<<solution->show_str_gen()<<";"<<solution->get_dist()<<";";
                                             while(true){
                                                 //cout<<"\n\n-----The "<<num_of_iterations<<" generation-----"<<endl;
                                                 num_of_iterations++;
@@ -419,16 +417,6 @@ int main() {
                                                 for(int i=0; i<procreator_pairs_num[procr_pairs_ind]*2; i++){
                                                     ch[i].show_gen();
                                                 }*/
-                                                for(int i=0; i<procreator_pairs_num[procr_pairs_ind]*2; i++){
-                                                    mut_rand=rand()%101;
-                                                    if(mut_rand<=mut_procent){
-                                                        //cout<<"Mutation occured!!!"<<endl;
-                                                        //ch[i].show_gen();
-                                                        chosen_mut(mut_ind[ind_of_mut], ch[i], 15, R);
-                                                        //cout<<"Changed to..."<<endl;
-                                                        //ch[i].show_gen();
-                                                    }
-                                                }
                                                 B_tournament(overlap_num(G_coef[G_coef_ind], num_of_pop[num_of_pop_ind]), ch, procreator_pairs_num[procr_pairs_ind]*2, B[B_ind], pot);
                                                 if(stop_cond_meth==1){
                                                     cur_stop_cond_val++;
@@ -443,8 +431,8 @@ int main() {
                                                         best_ind=i;
                                                     }
                                                 }
-                                                if(solution.get_dist()>population[best_ind].get_dist()){
-                                                    solution=*new progeny(population[best_ind]);
+                                                if(solution->get_dist()>population[best_ind].get_dist()){
+                                                    solution=new progeny(population[best_ind]);
                                                 }
                                                 if(stop_cond(stop_cond_meth, max_stop_cond_val[step_max_ind], &cur_stop_cond_val, &prev_stop_cond_val, population, num_of_pop[num_of_pop_ind])){
                                                     break;
@@ -452,22 +440,43 @@ int main() {
 
                                             }
                                             Finished1:
-                                            cout<<"-----The end best solution is:"<<endl;
-                                            solution.show_gen();
+                                            outdata<<solution->show_str_gen()<<";"<<solution->get_dist()<<endl;
                                             num_of_iterations=1;
                                             cur_stop_cond_val=0;
+                                            sec_table[iter]=*new progeny(*solution);
                                             delete[] pot;
                                             delete[] ch;
                                             delete[] population;
+                                            delete solution;
+                                            delete[] par_per_it;
+                                            delete[] ch_per_it;
                                             cout<<iteration_overall<<endl;
                                         }
+                                        int sec_table_ind_min;
+                                        double min=10000, aver=0, max=0;
+                                        for(int iloc=0; iloc<4; iloc++){
+                                            aver+=sec_table[iloc].get_dist();
+                                            if(sec_table[iloc].get_dist()<=min){
+                                                min=sec_table[iloc].get_dist();
+                                                sec_table_ind_min=iloc;
+                                            }
+                                            if(sec_table[iloc].get_dist()>=max){
+                                                max=sec_table[iloc].get_dist();
+                                            }
+                                        }
+                                        out_add_data<<"CR-"<<cross_ind<<" PN-"<<num_of_pop[num_of_pop_ind]<<" G-"<<overlap_num(G_coef[G_coef_ind], num_of_pop[num_of_pop_ind])<<" PP-"<<procreator_pairs_num[procr_pairs_ind]<<" SM-"<<selec_method[selec_meth_ind]<<" B-"<<B[B_ind]<<" MAX_STEP"<<max_stop_cond_val[step_max_ind]<<" PC-"<<procr_choice[procr_choice_ind]<<";";
+                                        out_add_data<<sec_table[sec_table_ind_min].show_str_gen()<<";"<<min<<";"<<(aver/4.)<<";"<<"["<<min<<"-"<<max<<"]"<<endl;
+                                        delete[] sec_table;
                                     }
                                 }
                             }
-                            else{
-                                for(int step_max_ind=0; step_max_ind<3; step_max_ind++){
-                                    for(int procr_choice_ind=0; procr_choice_ind<3; procr_choice_ind++){
-                                        cout<<"CR-"<<cross_ind<<", PN-"<<num_of_pop[num_of_pop_ind]<<", G-"<<overlap_num(G_coef[G_coef_ind], num_of_pop[num_of_pop_ind])<<", MT-"<<mut_ind[ind_of_mut]<<", PP-"<<procreator_pairs_num[procr_pairs_ind]<<", SM-"<<selec_method[selec_meth_ind]<<", MAX_STEP"<<max_stop_cond_val[step_max_ind]<<", PC-"<<procr_choice[procr_choice_ind]<<endl;
+                        }
+                        else{
+                            for(int step_max_ind=0; step_max_ind<3; step_max_ind++){
+                                for(int procr_choice_ind=0; procr_choice_ind<3; procr_choice_ind++){
+                                    progeny *sec_table=new progeny[4];
+                                    for(int iter=0; iter<4; iter++){
+                                        outdata<<"CR-"<<cross_ind<<" PN-"<<num_of_pop[num_of_pop_ind]<<" G-"<<overlap_num(G_coef[G_coef_ind], num_of_pop[num_of_pop_ind])<<" PP-"<<procreator_pairs_num[procr_pairs_ind]<<" SM-"<<selec_method[selec_meth_ind]<<" MAX_STEP"<<max_stop_cond_val[step_max_ind]<<" PC-"<<procr_choice[procr_choice_ind]<<";"<<iter+1<<";";
                                         iteration_overall++;
                                         progeny *ch=new progeny[procreator_pairs_num[procr_pairs_ind]*2];
                                         progeny *population=new progeny[num_of_pop[num_of_pop_ind]];
@@ -507,9 +516,8 @@ int main() {
                                                 global_ind=i;
                                             }
                                         }
-                                        progeny par_per_it[2], ch_per_it[2], solution=*new progeny(population[global_ind]);
-                                        cout<<"\nThe initial global solution is:"<<endl;
-                                        solution.show_gen();
+                                        progeny *par_per_it=new progeny[2], *ch_per_it=new progeny[2], *solution=new progeny(population[global_ind]);
+                                        outdata<<solution->show_str_gen()<<";"<<solution->get_dist()<<";";
                                         while(true){
                                             //cout<<"\n\n-----The "<<num_of_iterations<<" generation-----"<<endl;
                                             num_of_iterations++;
@@ -528,16 +536,6 @@ int main() {
                                             for(int i=0; i<procreator_pairs_num[procr_pairs_ind]*2; i++){
                                                 ch[i].show_gen();
                                             }*/
-                                            for(int i=0; i<procreator_pairs_num[procr_pairs_ind]*2; i++){
-                                                mut_rand=rand()%101;
-                                                if(mut_rand<=mut_procent){
-                                                    //cout<<"Mutation occured!!!"<<endl;
-                                                    //ch[i].show_gen();
-                                                    chosen_mut(mut_ind[ind_of_mut], ch[i], 15, R);
-                                                    //cout<<"Changed to..."<<endl;
-                                                    //ch[i].show_gen();
-                                                }
-                                            }
                                             roulete(overlap_num(G_coef[G_coef_ind], num_of_pop[num_of_pop_ind]), ch, procreator_pairs_num[procr_pairs_ind]*2, pot);
                                             if(stop_cond_meth==1){
                                                 cur_stop_cond_val++;
@@ -552,8 +550,8 @@ int main() {
                                                     best_ind=i;
                                                 }
                                             }
-                                            if(solution.get_dist()>population[best_ind].get_dist()){
-                                                solution=*new progeny(population[best_ind]);
+                                            if(solution->get_dist()>population[best_ind].get_dist()){
+                                                solution=new progeny(population[best_ind]);
                                             }
                                             if(stop_cond(stop_cond_meth, max_stop_cond_val[step_max_ind], &cur_stop_cond_val, &prev_stop_cond_val, population, num_of_pop[num_of_pop_ind])){
                                                 break;
@@ -561,15 +559,33 @@ int main() {
 
                                         }
                                         Finished2:
-                                        cout<<"-----The end best solution is:"<<endl;
-                                        solution.show_gen();
+                                        outdata<<solution->show_str_gen()<<";"<<solution->get_dist()<<endl;
                                         num_of_iterations=1;
                                         cur_stop_cond_val=0;
+                                        sec_table[iter]=*new progeny(*solution);
                                         delete[] pot;
                                         delete[] ch;
                                         delete[] population;
+                                        delete solution;
+                                        delete[] par_per_it;
+                                        delete[] ch_per_it;
                                         cout<<iteration_overall<<endl;
                                     }
+                                    int sec_table_ind_min;
+                                    double min=10000, aver=0, max=0;
+                                    for(int iloc=0; iloc<4; iloc++){
+                                        aver+=sec_table[iloc].get_dist();
+                                        if(sec_table[iloc].get_dist()<=min){
+                                            min=sec_table[iloc].get_dist();
+                                            sec_table_ind_min=iloc;
+                                        }
+                                        if(sec_table[iloc].get_dist()>=max){
+                                            max=sec_table[iloc].get_dist();
+                                        }
+                                    }
+                                    out_add_data<<"CR-"<<cross_ind<<" PN-"<<num_of_pop[num_of_pop_ind]<<" G-"<<overlap_num(G_coef[G_coef_ind], num_of_pop[num_of_pop_ind])<<" PP-"<<procreator_pairs_num[procr_pairs_ind]<<" SM-"<<selec_method[selec_meth_ind]<<" MAX_STEP"<<max_stop_cond_val[step_max_ind]<<" PC-"<<procr_choice[procr_choice_ind]<<";";
+                                    out_add_data<<sec_table[sec_table_ind_min].show_str_gen()<<";"<<min<<";"<<(aver/4.)<<";"<<"["<<min<<"-"<<max<<"]"<<endl;
+                                    delete[] sec_table;
                                 }
                             }
                         }

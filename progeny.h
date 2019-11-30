@@ -5,6 +5,7 @@
 #ifndef EGA10_PROGENY_H
 #define EGA10_PROGENY_H
 
+#include <string>
 
 class progeny {
     int generation;
@@ -31,6 +32,7 @@ public:
     void closest_n(double **R, bool pre);
     void closest_c(double **R, bool pre);
     void show_gen();
+    std::string show_str_gen();
     int get_gener();
     double get_dist();
 };
